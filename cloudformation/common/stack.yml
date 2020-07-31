@@ -208,3 +208,29 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRoutingTable2
       SubnetId: !Ref PrivateSubnet2
+
+Outputs:
+  AvailabilityZone1:
+    Value: !Ref AvailabilityZone1
+    Export:
+      Name: CapstoneAvailabilityZone1
+  AvailabilityZone2:
+    Value: !Ref AvailabilityZone2
+    Export:
+      Name: CapstoneAvailabilityZone2
+  PublicSubnet1ID:
+    Value: !Ref PublicSubnet1
+    Export:
+      Name: CapstonePublicSubnet1ID
+  PublicSubnet2ID:
+    Value: !Ref PublicSubnet2
+    Export:
+      Name: CapstonePublicSubnet2ID
+  PrivateSubnet1ID:
+    Value: !Ref PrivateSubnet1
+    Export:
+      Name: CapstonePrivateSubnet1ID
+  PrivateSubnet2ID:
+    Value: !Ref PrivateSubnet2
+    Export:
+      Name: CapstonePrivateSubnet2IDqx
