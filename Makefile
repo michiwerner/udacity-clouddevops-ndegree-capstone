@@ -21,5 +21,9 @@ provision-common-stack:
 			--parameters "file://./cloudformation/common/parameters.json" \
 			--output json; \
 	fi
+delete-common-stack:
+	aws cloudformation delete-stack \
+		--stack-name $(common_stack_name) \
+		--region $(aws_region)
 	
 	 
