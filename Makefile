@@ -1,4 +1,4 @@
-common_stack_name = devops-capstone
+common_stack_name = devops-capstone-common
 aws_region = eu-central-1
 
 provision-common-stack:
