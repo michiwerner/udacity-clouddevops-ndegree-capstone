@@ -13,8 +13,8 @@ ubuntu_ami_id = $(shell aws ec2 describe-images --region $(aws_region) --filters
 provision-common-stack:
 	list_stacks_output=`aws cloudformation list-stacks \
 		--region $(aws_region) \
-		--output json \
-		| jq -r '.StackSummaries[] | select(.StackStatus != "DELETE_COMPLETE") | select(.StackName == "$(common_stack_name)") | .StackName'`; \
+		--query "StackSummaries[?StackStatus != 'DELETE_COMPLETE' && StackName == '$(common_stack_name)'] | [0].StackName" \
+		--output text`; \
 	if [ -n "$$list_stacks_output" ]; then \
 		aws cloudformation update-stack \
 			--stack-name $(common_stack_name) \
