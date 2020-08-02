@@ -233,4 +233,4 @@ Outputs:
   PrivateSubnet2ID:
     Value: !Ref PrivateSubnet2
     Export:
-      Name: CapstonePrivateSubnet2IDqx
+      Name: CapstonePrivateSubnet2ID
