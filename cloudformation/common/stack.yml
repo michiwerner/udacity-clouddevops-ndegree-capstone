@@ -210,6 +210,10 @@ Resources:
       SubnetId: !Ref PrivateSubnet2
 
 Outputs:
+  VPC:
+    Value: !Ref VPC
+    Export:
+      Name: CapstoneVPC
   AvailabilityZone1:
     Value: !Ref AvailabilityZone1
     Export:
