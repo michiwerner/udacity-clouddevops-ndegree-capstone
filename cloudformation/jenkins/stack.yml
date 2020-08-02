@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  Environment:
+    Type: String
+  JenkinsAllowedCIDR:
+    Type: String
+  JenkinsSSHKeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  UbuntuAMIID:
+    Type: AWS::EC2::Image::Id
+
+Resources:
+
+  JenkinsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      GroupName: jenkins-sg
+      GroupDescription: Security group for the jenkins server
+      VpcId: !ImportValue CapstoneVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref JenkinsAllowedCIDR
+
+  JenkinsEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      ImageId: !Ref UbuntuAMIID
+      InstanceType: t3.nano
+      SubnetId: !ImportValue CapstonePublicSubnet1ID
+      UserData: !Base64 |
+        #!/bin/sh
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -y
+        apt-get dist-upgrade -y
+        reboot
+      SecurityGroupIds:
+        - !Ref JenkinsSecurityGroup
+      KeyName: !Ref JenkinsSSHKeyName
+      SourceDestCheck: true
