@@ -1,0 +1,18 @@
+[
+    {
+      "ParameterKey": "Environment",
+      "ParameterValue": "development"
+    },
+    {
+      "ParameterKey": "JenkinsAllowedCIDR",
+      "ParameterValue": "0.0.0.0/0"
+    },
+    {
+      "ParameterKey": "JenkinsSSHKeyName",
+      "ParameterValue": "id_rsa"
+    },
+    {
+      "ParameterKey": "UbuntuAMIID",
+      "ParameterValue": "<<<AMI_ID>>>"
+    }
+]

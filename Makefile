@@ -34,7 +34,9 @@ delete-common-stack:
 	aws cloudformation delete-stack \
 		--stack-name $(common_stack_name) \
 		--region $(aws_region)
-provision-jenkins-stack:
+cloudformation/jenkins/parameters-$(aws_region).json:
+	sed -e 's/<<<AMI_ID>>>/$(ubuntu_ami_id)/' ./cloudformation/jenkins/parameters.tpl.json > ./cloudformation/jenkins/parameters-$(aws_region).json
+provision-jenkins-stack: cloudformation/jenkins/parameters-$(aws_region).json
 	list_stacks_output=`aws cloudformation list-stacks \
 		--region $(aws_region) \
 		--output json \
@@ -44,14 +46,14 @@ provision-jenkins-stack:
 			--stack-name $(jenkins_stack_name) \
 			--region $(aws_region) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
-			--parameters "file://./cloudformation/jenkins/parameters.json" \
+			--parameters "file://./cloudformation/jenkins/parameters-$(aws_region).json" \
 			--output json; \
 	else \
 		aws cloudformation create-stack \
 			--stack-name $(jenkins_stack_name) \
 			--region $(aws_region) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
-			--parameters "file://./cloudformation/jenkins/parameters.json" \
+			--parameters "file://./cloudformation/jenkins/parameters-$(aws_region).json" \
 			--output json; \
 	fi
 delete-jenkins-stack:
