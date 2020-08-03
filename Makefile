@@ -15,14 +15,14 @@ provision-common-stack:
 			--region $(AWS_REGION) \
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/common/stack.yml" \
-			--parameters "file://./cloudformation/common/parameters.json" \
+			--parameters "file://./cloudformation/common/parameters.json"; \
 	else \
 		aws cloudformation create-stack \
 			--stack-name $(COMMON_STACK_NAME) \
 			--region $(AWS_REGION) \
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/common/stack.yml" \
-			--parameters "file://./cloudformation/common/parameters.json" \
+			--parameters "file://./cloudformation/common/parameters.json"; \
 	fi
 delete-common-stack:
 	aws cloudformation delete-stack \
@@ -41,19 +41,17 @@ provision-jenkins-stack:
 			--region $(AWS_REGION) \
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
-			--parameters "file://./cloudformation/jenkins/parameters.json" \
+			--parameters "file://./cloudformation/jenkins/parameters.json"; \
 	else \
 		aws cloudformation create-stack \
 			--stack-name $(JENKINS_STACK_NAME) \
 			--region $(AWS_REGION) \
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
-			--parameters "file://./cloudformation/jenkins/parameters.json" \
+			--parameters "file://./cloudformation/jenkins/parameters.json"; \
 	fi
 delete-jenkins-stack:
 	aws cloudformation delete-stack \
 		--stack-name $(JENKINS_STACK_NAME) \
 		--region $(AWS_REGION) \
 		--profile $(AWS_PROFILE)
-
-	 
