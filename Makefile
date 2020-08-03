@@ -35,8 +35,8 @@ provision-jenkins-stack:
 	list_stacks_output=`aws cloudformation list-stacks \
 		--region $(AWS_REGION) \
 		--profile $(AWS_PROFILE) \
-		--output json \
-		| jq -r '.StackSummaries[] | select(.StackStatus != "DELETE_COMPLETE") | select(.StackName == "$(JENKINS_STACK_NAME)") | .StackName'`; \
+		--query "StackSummaries[?StackStatus != 'DELETE_COMPLETE' && StackName == '$(JENKINS_STACK_NAME)'] | [0].StackName" \
+		--output text`; \
 	if [ "$$list_stacks_output" != "None" ]; then \
 		aws cloudformation update-stack \
 			--stack-name $(JENKINS_STACK_NAME) \
