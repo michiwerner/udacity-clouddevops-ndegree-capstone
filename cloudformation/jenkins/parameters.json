@@ -10,9 +10,5 @@
     {
       "ParameterKey": "JenkinsSSHKeyName",
       "ParameterValue": "id_rsa"
-    },
-    {
-      "ParameterKey": "UbuntuAMIID",
-      "ParameterValue": "<<<AMI_ID>>>"
     }
 ]
