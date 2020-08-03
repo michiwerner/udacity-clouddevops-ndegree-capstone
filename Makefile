@@ -1,54 +1,63 @@
-common_stack_name = devops-capstone-common
-jenkins_stack_name = devops-capstone-jenkins
-aws_region = eu-central-1
+COMMON_STACK_NAME = devops-capstone-common
+JENKINS_STACK_NAME = devops-capstone-jenkins
+AWS_REGION ?= eu-central-1
+AWS_PROFILE ?= default
 
 provision-common-stack:
 	list_stacks_output=`aws cloudformation list-stacks \
-		--region $(aws_region) \
-		--query "StackSummaries[?StackStatus != 'DELETE_COMPLETE' && StackName == '$(common_stack_name)'] | [0].StackName" \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE) \
+		--query "StackSummaries[?StackStatus != 'DELETE_COMPLETE' && StackName == '$(COMMON_STACK_NAME)'] | [0].StackName" \
 		--output text`; \
 	if [ -n "$$list_stacks_output" ]; then \
 		aws cloudformation update-stack \
-			--stack-name $(common_stack_name) \
-			--region $(aws_region) \
+			--stack-name $(COMMON_STACK_NAME) \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/common/stack.yml" \
 			--parameters "file://./cloudformation/common/parameters.json" \
 			--output json; \
 	else \
 		aws cloudformation create-stack \
-			--stack-name $(common_stack_name) \
-			--region $(aws_region) \
+			--stack-name $(COMMON_STACK_NAME) \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/common/stack.yml" \
 			--parameters "file://./cloudformation/common/parameters.json" \
 			--output json; \
 	fi
 delete-common-stack:
 	aws cloudformation delete-stack \
-		--stack-name $(common_stack_name) \
-		--region $(aws_region)
+		--stack-name $(COMMON_STACK_NAME) \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE)
 provision-jenkins-stack:
 	list_stacks_output=`aws cloudformation list-stacks \
-		--region $(aws_region) \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE) \
 		--output json \
-		| jq -r '.StackSummaries[] | select(.StackStatus != "DELETE_COMPLETE") | select(.StackName == "$(jenkins_stack_name)") | .StackName'`; \
+		| jq -r '.StackSummaries[] | select(.StackStatus != "DELETE_COMPLETE") | select(.StackName == "$(JENKINS_STACK_NAME)") | .StackName'`; \
 	if [ -n "$$list_stacks_output" ]; then \
 		aws cloudformation update-stack \
-			--stack-name $(jenkins_stack_name) \
-			--region $(aws_region) \
+			--stack-name $(JENKINS_STACK_NAME) \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
 			--parameters "file://./cloudformation/jenkins/parameters.json" \
 			--output json; \
 	else \
 		aws cloudformation create-stack \
-			--stack-name $(jenkins_stack_name) \
-			--region $(aws_region) \
+			--stack-name $(JENKINS_STACK_NAME) \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
 			--parameters "file://./cloudformation/jenkins/parameters.json" \
 			--output json; \
 	fi
 delete-jenkins-stack:
 	aws cloudformation delete-stack \
-		--stack-name $(jenkins_stack_name) \
-		--region $(aws_region)
-	
+		--stack-name $(JENKINS_STACK_NAME) \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE)
+
 	 
