@@ -66,7 +66,11 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
-      ImageId: !FindInMap [ AMIRegionMap, !Ref AWS::Region, AMI ]
+      ImageId:
+        Fn::FindInMap:
+          - AMIRegionMap
+          - !Ref AWS::Region
+          - AMI
       InstanceType: t3.nano
       SubnetId: !ImportValue CapstonePublicSubnet1ID
       UserData: !Base64 |
