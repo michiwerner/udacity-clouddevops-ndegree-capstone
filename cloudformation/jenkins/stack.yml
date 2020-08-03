@@ -90,3 +90,9 @@ Resources:
         - !Ref JenkinsSecurityGroup
       KeyName: !Ref JenkinsSSHKeyName
       SourceDestCheck: true
+
+Outputs:
+  JenkinsPublicIP:
+    Value: !GetAtt JenkinsEC2Instance.PublicIp
+  JenkinsPublicDNS:
+    Value: !GetAtt JenkinsEC2Instance.PublicDnsName
