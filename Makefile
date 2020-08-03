@@ -16,7 +16,6 @@ provision-common-stack:
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/common/stack.yml" \
 			--parameters "file://./cloudformation/common/parameters.json" \
-			--output json; \
 	else \
 		aws cloudformation create-stack \
 			--stack-name $(COMMON_STACK_NAME) \
@@ -24,7 +23,6 @@ provision-common-stack:
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/common/stack.yml" \
 			--parameters "file://./cloudformation/common/parameters.json" \
-			--output json; \
 	fi
 delete-common-stack:
 	aws cloudformation delete-stack \
@@ -44,7 +42,6 @@ provision-jenkins-stack:
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
 			--parameters "file://./cloudformation/jenkins/parameters.json" \
-			--output json; \
 	else \
 		aws cloudformation create-stack \
 			--stack-name $(JENKINS_STACK_NAME) \
@@ -52,7 +49,6 @@ provision-jenkins-stack:
 			--profile $(AWS_PROFILE) \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
 			--parameters "file://./cloudformation/jenkins/parameters.json" \
-			--output json; \
 	fi
 delete-jenkins-stack:
 	aws cloudformation delete-stack \
