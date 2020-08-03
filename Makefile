@@ -9,7 +9,7 @@ provision-common-stack:
 		--profile $(AWS_PROFILE) \
 		--query "StackSummaries[?StackStatus != 'DELETE_COMPLETE' && StackName == '$(COMMON_STACK_NAME)'] | [0].StackName" \
 		--output text`; \
-	if [ -n "$$list_stacks_output" ]; then \
+	if [ "$$list_stacks_output" != "None" ]; then \
 		aws cloudformation update-stack \
 			--stack-name $(COMMON_STACK_NAME) \
 			--region $(AWS_REGION) \
@@ -37,7 +37,7 @@ provision-jenkins-stack:
 		--profile $(AWS_PROFILE) \
 		--output json \
 		| jq -r '.StackSummaries[] | select(.StackStatus != "DELETE_COMPLETE") | select(.StackName == "$(JENKINS_STACK_NAME)") | .StackName'`; \
-	if [ -n "$$list_stacks_output" ]; then \
+	if [ "$$list_stacks_output" != "None" ]; then \
 		aws cloudformation update-stack \
 			--stack-name $(JENKINS_STACK_NAME) \
 			--region $(AWS_REGION) \
