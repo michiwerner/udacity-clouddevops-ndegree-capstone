@@ -30,6 +30,8 @@ Resources:
         - Key: Environment
           Value: !Ref Environment
       CidrBlock: !Ref VPCCIDR
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
 
   IGW:
     Type: AWS::EC2::InternetGateway
