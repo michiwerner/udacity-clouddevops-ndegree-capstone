@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
   Environment:
     Type: String
+  JenkinsInstanceType:
+    Type: String
+    Default: t3.small
   JenkinsAllowedCIDR:
     Type: String
   JenkinsSSHKeyName:
@@ -88,7 +91,7 @@ Resources:
           - AMIRegionMap
           - !Ref AWS::Region
           - AMI
-      InstanceType: t3.nano
+      InstanceType: !Ref JenkinsInstanceType
       SubnetId: !ImportValue CapstonePublicSubnet1ID
       UserData: !Base64 |
         #!/bin/bash
