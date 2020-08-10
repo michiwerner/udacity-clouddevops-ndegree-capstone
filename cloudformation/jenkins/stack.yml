@@ -122,7 +122,11 @@ Resources:
         apt-get install -y jenkins docker-ce docker-ce-cli containerd.io
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
-        ./aws/install
+        if [ -d /usr/local/aws-cli/v2/current ]; then
+          ./aws/install --update
+        else
+          ./aws/install
+        fi
         rm -fr awscliv2.zip aws 
         if [ ! -f /etc/nginx/tls/selfsigned_cert.key ]; then
           mkdir -p /etc/nginx/tls
