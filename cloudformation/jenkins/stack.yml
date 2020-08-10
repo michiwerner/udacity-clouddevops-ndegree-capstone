@@ -93,7 +93,7 @@ Resources:
       UserData: !Base64 |
         #!/bin/bash
         if [ ! -f /var/swap.1 ]; then
-          dd if=/dev/zero of=/var/swap.1 bs=1M count=4096
+          dd if=/dev/zero of=/var/swap.1 bs=1M count=8192
           chmod 600 /var/swap.1
           mkswap /var/swap.1
           swapon /var/swap.1
@@ -102,16 +102,24 @@ Resources:
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -y
         apt-get dist-upgrade -y
-        apt-get install -y curl openssl nginx openjdk-8-jdk
-        curl https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
+        apt-get install -y curl openssl nginx openjdk-8-jdk apt-transport-https ca-certificates gnupg-agent software-properties-common
+        rm -f /usr/local/bin/hadolint
+        curl -o /usr/local/bin/hadolint 'https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-Linux-x86_64'
+        chmod +x /usr/local/bin/hadolint
+        rm -f /usr/local/bin/docker-compose
+        curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+        curl 'https://pkg.jenkins.io/debian-stable/jenkins.io.key' | apt-key add -
         echo 'deb https://pkg.jenkins.io/debian-stable binary/' > /etc/apt/sources.list.d/jenkins.list
+        curl -fsSL 'https://download.docker.com/linux/ubuntu/gpg' | apt-key add -
+        add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
         apt-get update -y
-        apt-get install -y jenkins
+        apt-get install -y jenkins docker-ce docker-ce-cli containerd.io
         mkdir -p /etc/nginx/tls
-        export EC2_PUBLIC_IP="$(curl http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null)"
-        export EC2_PUBLIC_DNS="$(curl http://169.254.169.254/latest/meta-data/public-hostname 2>/dev/null)"
-        export EC2_PRIVATE_IP="$(curl http://169.254.169.254/latest/meta-data/local-ipv4 2>/dev/null)"
-        export EC2_PRIVATE_DNS="$(curl http://169.254.169.254/latest/meta-data/local-hostname 2>/dev/null)"
+        export EC2_PUBLIC_IP="$(curl 'http://169.254.169.254/latest/meta-data/public-ipv4' 2>/dev/null)"
+        export EC2_PUBLIC_DNS="$(curl 'http://169.254.169.254/latest/meta-data/public-hostname' 2>/dev/null)"
+        export EC2_PRIVATE_IP="$(curl 'http://169.254.169.254/latest/meta-data/local-ipv4' 2>/dev/null)"
+        export EC2_PRIVATE_DNS="$(curl 'http://169.254.169.254/latest/meta-data/local-hostname' 2>/dev/null)"
         (cat /etc/ssl/openssl.cnf; printf "[SAN]\nsubjectAltName=DNS:$EC2_PUBLIC_DNS,DNS:$EC2_PRIVATE_DNS,IP:$EC2_PUBLIC_IP,IP:$EC2_PRIVATE_IP") \
           | openssl req -newkey rsa:4096 -x509 -nodes -keyout /etc/nginx/tls/selfsigned_cert.key \
             -new -out /etc/nginx/tls/selfsigned_cert.crt -subj "/CN=$EC2_PUBLIC_DNS" \
@@ -142,6 +150,29 @@ Resources:
           }
         }
         EOF
+        mkdir -p /opt/anchore
+        curl 'https://docs.anchore.com/current/docs/engine/quickstart/docker-compose.yaml' > /opt/anchore/docker-compose.yaml
+        # Source for systemd config: https://stackoverflow.com/questions/43671482/how-to-run-docker-compose-up-d-at-system-start-up
+        cat >/etc/systemd/system/docker-compose-anchore.service <<EOF
+        [Unit]
+        Description=Docker Compose Anchore Service
+        Requires=docker.service
+        After=docker.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=yes
+        WorkingDirectory=/opt/anchore
+        ExecStart=/usr/local/bin/docker-compose up -d
+        ExecStop=/usr/local/bin/docker-compose down
+        TimeoutStartSec=0
+
+        [Install]
+        WantedBy=multi-user.target
+        EOF
+        systemctl enable docker-compose-anchore
+        apt-get autoremove -y
+        apt-get clean
         reboot
       SecurityGroupIds:
         - !Ref JenkinsSecurityGroup
