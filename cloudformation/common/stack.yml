@@ -26,7 +26,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: udacity-vpc
+          Value: devops-capstone-vpc
         - Key: Environment
           Value: !Ref Environment
       CidrBlock: !Ref VPCCIDR
@@ -38,7 +38,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: internet-gateway
+          Value: devops-capstone-internet-gateway
 
   VPCIGW:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -55,7 +55,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: public-subnet-1
+          Value: devops-capstone-public-subnet-1
         - Key: Environment
           Value: !Ref Environment
 
@@ -68,7 +68,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: private-subnet-1
+          Value: devops-capstone-private-subnet-1
         - Key: Environment
           Value: !Ref Environment
 
@@ -81,7 +81,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: public-subnet-2
+          Value: devops-capstone-public-subnet-2
         - Key: Environment
           Value: !Ref Environment
 
@@ -94,7 +94,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: private-subnet-2
+          Value: devops-capstone-private-subnet-2
         - Key: Environment
           Value: !Ref Environment
 
@@ -121,7 +121,7 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       Tags:
         - Key: Name
-          Value: nat-gateway-1
+          Value: devops-capstone-nat-gateway-1
         - Key: Environment
           Value: !Ref Environment
 
@@ -132,7 +132,7 @@ Resources:
       SubnetId: !Ref PublicSubnet2
       Tags:
         - Key: Name
-          Value: nat-gateway-2
+          Value: devops-capstone-nat-gateway-2
         - Key: Environment
           Value: !Ref Environment
 
@@ -142,7 +142,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: public-routing-table
+          Value: devops-capstone-public-routing-table
         - Key: Environment
           Value: !Ref Environment
 
@@ -152,7 +152,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: private-routing-table-1
+          Value: devops-capstone-private-routing-table-1
         - Key: Environment
           Value: !Ref Environment
 
@@ -162,7 +162,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: private-routing-table-2
+          Value: devops-capstone-private-routing-table-2
         - Key: Environment
           Value: !Ref Environment
 
