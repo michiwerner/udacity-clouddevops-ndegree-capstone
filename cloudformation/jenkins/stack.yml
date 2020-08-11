@@ -4,7 +4,7 @@ Parameters:
     Type: String
   JenkinsInstanceType:
     Type: String
-    Default: t3.small
+    Default: t3.nano
   JenkinsAllowedCIDR:
     Type: String
   JenkinsSSHKeyName:
@@ -54,7 +54,7 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
-      GroupName: jenkins-sg
+      GroupName: devops-capstone-jenkins-sg
       GroupDescription: Security group for the jenkins server
       VpcId: !ImportValue CapstoneVPC
       SecurityGroupIngress:
@@ -86,6 +86,8 @@ Resources:
       Tags:
         - Key: Environment
           Value: !Ref Environment
+        - Key: Name
+          Value: devops-capstone-jenkins
       ImageId:
         Fn::FindInMap:
           - AMIRegionMap
@@ -110,8 +112,6 @@ Resources:
         rm -f /usr/local/bin/hadolint
         curl 'https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-Linux-x86_64' -o /usr/local/bin/hadolint
         chmod +x /usr/local/bin/hadolint
-        curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        chmod +x /usr/local/bin/docker-compose
         curl -L "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
         chmod +x /usr/local/bin/kubectl
         curl 'https://pkg.jenkins.io/debian-stable/jenkins.io.key' | apt-key add -
@@ -165,27 +165,6 @@ Resources:
           }
         }
         EOF
-        mkdir -p /opt/anchore
-        curl 'https://docs.anchore.com/current/docs/engine/quickstart/docker-compose.yaml' -o /opt/anchore/docker-compose.yaml
-        # Source for systemd config: https://stackoverflow.com/questions/43671482/how-to-run-docker-compose-up-d-at-system-start-up
-        cat >/etc/systemd/system/docker-compose-anchore.service <<EOF
-        [Unit]
-        Description=Docker Compose Anchore Service
-        Requires=docker.service
-        After=docker.service
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        WorkingDirectory=/opt/anchore
-        ExecStart=/usr/local/bin/docker-compose up -d
-        ExecStop=/usr/local/bin/docker-compose down
-        TimeoutStartSec=0
-
-        [Install]
-        WantedBy=multi-user.target
-        EOF
-        systemctl enable docker-compose-anchore
         apt-get autoremove -y
         apt-get clean
         reboot
@@ -200,8 +179,44 @@ Resources:
             VolumeSize: '30'
             DeleteOnTermination: 'true'
             Encrypted: 'true'
+  JenkinsEC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      RoleName: devops-capstone-jenkins-ec2-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: devops-capstone-jenkins-ecr-access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: "*"
+
+  JenkinsEC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: devops-capstone-jenkins-ec2-instance-profile
+      Roles:
+        - !Ref JenkinsEC2Role
 
 Outputs:
+  JenkinsEC2RoleArn:
+    Value: !GetAtt JenkinsEC2Role.Arn
+    Export:
+      Name: CapstoneJenkinsEC2RoleArn
   JenkinsIP:
     Value: !GetAtt JenkinsEC2Instance.PublicIp
   JenkinsDNS:

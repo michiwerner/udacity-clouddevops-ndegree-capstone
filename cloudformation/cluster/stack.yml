@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  Environment:
+    Type: String
+  NodegroupSize:
+    Type: String
+
+Resources:
+  ECR:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: devops-capstone-sample-workload
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: devops-capstone-allow-jenkins-ec2-full-access
+            Effect: Allow
+            Principal:
+              AWS:
+                - !ImportValue CapstoneJenkinsEC2RoleArn
+            Action:
+              - ecr:*
+          # - Sid: devops-capstone-allow-eks-node-read-access
+          #   Effect: Allow
+          #   Principal:
+          #     AWS:
+          #       - !GetAtt EKSNodeRole.Arn
+          #   Action:
+          #     - ecr:GetDownloadUrlForLayer
+          #     - ecr:BatchGetImage
+          #     - ecr:BatchCheckLayerAvailability
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "delete untagged images older than one day",
+                "selection": {
+                  "tagStatus": "untagged",
+                  "countType": "sinceImagePushed",
+                  "countUnit": "days",
+                  "countNumber": 1
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+  EKSControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      GroupName: devops-capstone-eks-controlplane-sg
+      GroupDescription: Security group for the EKS control plane
+      VpcId: !ImportValue CapstoneVPC
+  EKSControlPlaneSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !GetAtt EKSControlPlaneSecurityGroup.GroupId
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref EKSControlPlaneSecurityGroup
+  EKSClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - eks.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+  EKSCluster: 
+    Type: AWS::EKS::Cluster
+    Properties: 
+      Name: devops-capstone-eks-cluster
+      ResourcesVpcConfig: 
+        SecurityGroupIds: 
+          - !GetAtt EKSControlPlaneSecurityGroup.GroupId
+        SubnetIds: 
+          - !ImportValue CapstonePublicSubnet1ID
+          - !ImportValue CapstonePublicSubnet2ID
+          - !ImportValue CapstonePrivateSubnet1ID
+          - !ImportValue CapstonePrivateSubnet2ID
+      RoleArn: !GetAtt EKSClusterRole.Arn
+  EKSNodeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+      RoleName: devops-capstone-eks-node-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      # Policies:
+      #   - PolicyName: devops-capstone-jenkins-ecr-access
+      #     PolicyDocument:
+      #       Version: 2012-10-17
+      #       Statement:
+      #         - Effect: Allow
+      #           Action: ecr:GetAuthorizationToken
+      #           Resource: "*" 
+  EKSNodeGroup:    
+    Type: AWS::EKS::Nodegroup
+    Properties: 
+      ClusterName: !Ref EKSCluster
+      DiskSize: 30
+      ForceUpdateEnabled: true
+      InstanceTypes: 
+        - t3.small
+      NodegroupName: devops-capstone-eks-nodegroup
+      NodeRole: !GetAtt EKSNodeRole.Arn
+      Subnets: 
+        - !ImportValue CapstonePrivateSubnet1ID
+        - !ImportValue CapstonePrivateSubnet2ID
+      Tags:
+        Environment: !Ref Environment
+      ScalingConfig:
+        DesiredSize: !Ref NodegroupSize
+        MaxSize: !Ref NodegroupSize
+        MinSize: !Ref NodegroupSize
+
+Outputs:
+  EKSEndpoint:
+    Value: !GetAtt EKSCluster.Endpoint
+  EKSCertificateAuthorityData:
+    Value: !GetAtt EKSCluster.CertificateAuthorityData

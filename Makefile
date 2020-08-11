@@ -1,5 +1,6 @@
-COMMON_STACK_NAME = devops-capstone-common
-JENKINS_STACK_NAME = devops-capstone-jenkins
+COMMON_STACK_NAME ?= devops-capstone-common
+JENKINS_STACK_NAME ?= devops-capstone-jenkins
+CLUSTER_STACK_NAME ?= devops-capstone-cluster
 AWS_REGION ?= eu-central-1
 AWS_PROFILE ?= default
 
@@ -40,6 +41,7 @@ provision-jenkins-stack:
 			--stack-name $(JENKINS_STACK_NAME) \
 			--region $(AWS_REGION) \
 			--profile $(AWS_PROFILE) \
+			--capabilities CAPABILITY_NAMED_IAM \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
 			--parameters "file://./cloudformation/jenkins/parameters.json"; \
 	else \
@@ -47,11 +49,40 @@ provision-jenkins-stack:
 			--stack-name $(JENKINS_STACK_NAME) \
 			--region $(AWS_REGION) \
 			--profile $(AWS_PROFILE) \
+			--capabilities CAPABILITY_NAMED_IAM \
 			--template-body "file://./cloudformation/jenkins/stack.yml" \
 			--parameters "file://./cloudformation/jenkins/parameters.json"; \
 	fi
 delete-jenkins-stack:
 	aws cloudformation delete-stack \
 		--stack-name $(JENKINS_STACK_NAME) \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE)
+provision-cluster-stack:
+	list_stacks_output=`aws cloudformation list-stacks \
+		--region $(AWS_REGION) \
+		--profile $(AWS_PROFILE) \
+		--query "StackSummaries[?StackStatus != 'DELETE_COMPLETE' && StackName == '$(CLUSTER_STACK_NAME)'] | [0].StackName" \
+		--output text`; \
+	if [ "$$list_stacks_output" != "None" ]; then \
+		aws cloudformation update-stack \
+			--stack-name $(CLUSTER_STACK_NAME) \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
+			--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+			--template-body "file://./cloudformation/cluster/stack.yml" \
+			--parameters "file://./cloudformation/cluster/parameters.json"; \
+	else \
+		aws cloudformation create-stack \
+			--stack-name $(CLUSTER_STACK_NAME) \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
+			--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+			--template-body "file://./cloudformation/cluster/stack.yml" \
+			--parameters "file://./cloudformation/cluster/parameters.json"; \
+	fi
+delete-cluster-stack:
+	aws cloudformation delete-stack \
+		--stack-name $(CLUSTER_STACK_NAME) \
 		--region $(AWS_REGION) \
 		--profile $(AWS_PROFILE)
