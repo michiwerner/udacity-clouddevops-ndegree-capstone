@@ -21,5 +21,5 @@ SSH user is `ubuntu`.
 1. Navigate to the public IP or public DNS hostname of your Jenkins EC2 instance over HTTPS. These values, including a HTTPS URL for your convenience, are outputs of the Jenkins Cloudformation stack. Alternatively, you can also look them up on the AWS Console's EC2 Instances page.
 2. Since the HTTPS certificate is self-signed, depending on your web browser you will either have to confirm that you trust this website, or you can import the certificate as a trusted certificate on the OS level. For the latter, please find the certificate file on the Jenkins VM under the path `/etc/nginx/tls/selfsigned_cert.crt`.
 3. Follow the Jenkins Setup procedure. Choose the suggested plugins option.
-4. In the Jenkins Admin Area, open the Plugin Manger and install the following plugins: Blue Ocean, variant, pipeline-aws (Pipeline: AWS Steps), Kubernetes Continuous Deploy, docker-build-step.
+4. In the Jenkins Admin Area, open the Plugin Manger and install the following plugins: Blue Ocean, variant, pipeline-aws (Pipeline: AWS Steps).
 5. Now you can add the folder where this code resides as a pipeline in jenkins. (e.g. GitHub connection)
