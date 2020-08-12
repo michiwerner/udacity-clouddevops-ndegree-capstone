@@ -167,6 +167,8 @@ Resources:
         EOF
         apt-get autoremove -y
         apt-get clean
+        chown root:jenkins /var/run/docker.sock
+        chmod 660 /var/run/docker.sock
         reboot
       SecurityGroupIds:
         - !Ref JenkinsSecurityGroup
