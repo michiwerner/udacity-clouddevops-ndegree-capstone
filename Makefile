@@ -1,6 +1,7 @@
 COMMON_STACK_NAME ?= devops-capstone-common
 JENKINS_STACK_NAME ?= devops-capstone-jenkins
 CLUSTER_STACK_NAME ?= devops-capstone-cluster
+CLUSTER_NAME ?= devops-capstone-eks-cluster
 AWS_REGION ?= eu-central-1
 AWS_PROFILE ?= default
 
@@ -86,3 +87,10 @@ delete-cluster-stack:
 		--stack-name $(CLUSTER_STACK_NAME) \
 		--region $(AWS_REGION) \
 		--profile $(AWS_PROFILE)
+grant-kubernetes-access-to-jenkins:
+	aws eks --region $(AWS_REGION) update-kubeconfig --name $(CLUSTER_NAME)
+	jenkins_ec2_role_arn=`aws cloudformation list-exports \
+			--region $(AWS_REGION) \
+			--profile $(AWS_PROFILE) \
+			--query "Exports[?Name == 'CapstoneJenkinsEC2RoleArn'] | [0].Value" | sed -e 's/"//g'`; \
+	cat aws-auth.tpl.yml | sed -e "s%ROLE_ARN%$$jenkins_ec2_role_arn%g" | kubectl apply -f -
