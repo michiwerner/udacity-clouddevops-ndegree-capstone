@@ -17,8 +17,11 @@ pipeline {
       steps {
         withAWS() {
           script {
+            sh "docker tag sample_workload:latest $(aws ecr describe-repositories --repository-names 'devops-capstone-sample-workload' --query 'repositories[0].repositoryUri'):latest"
+            sh "docker tag sample_workload:${BUILD_NUMBER} $(aws ecr describe-repositories --repository-names 'devops-capstone-sample-workload' --query 'repositories[0].repositoryUri'):${BUILD_NUMBER}"
             def dockerLogin = ecrLogin()
             sh "${dockerLogin}"
+            sh "docker push $(aws ecr describe-repositories --repository-names 'devops-capstone-sample-workload' --query 'repositories[0].repositoryUri')"
           }
         }
       }
