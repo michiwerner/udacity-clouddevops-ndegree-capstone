@@ -127,7 +127,6 @@ Resources:
       ForceUpdateEnabled: true
       InstanceTypes: 
         - t3.large
-      NodegroupName: devops-capstone-eks-nodegroup
       NodeRole: !GetAtt EKSNodeRole.Arn
       Subnets: 
         - !ImportValue CapstonePrivateSubnet1ID
