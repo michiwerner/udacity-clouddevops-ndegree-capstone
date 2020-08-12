@@ -110,17 +110,17 @@ Resources:
         apt-get dist-upgrade -y
         apt-get install -y unzip tidy curl openssl nginx openjdk-8-jdk apt-transport-https ca-certificates gnupg-agent software-properties-common
         rm -f /usr/local/bin/hadolint
-        curl 'https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-Linux-x86_64' -o /usr/local/bin/hadolint
+        curl -L 'https://github.com/hadolint/hadolint/releases/download/v1.18.0/hadolint-Linux-x86_64' -o /usr/local/bin/hadolint
         chmod +x /usr/local/bin/hadolint
         curl -L "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl
         chmod +x /usr/local/bin/kubectl
-        curl 'https://pkg.jenkins.io/debian-stable/jenkins.io.key' | apt-key add -
+        curl -L 'https://pkg.jenkins.io/debian-stable/jenkins.io.key' | apt-key add -
         echo 'deb https://pkg.jenkins.io/debian-stable binary/' > /etc/apt/sources.list.d/jenkins.list
         curl -fsSL 'https://download.docker.com/linux/ubuntu/gpg' | apt-key add -
         add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
         apt-get update -y
         apt-get install -y jenkins docker-ce docker-ce-cli containerd.io
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
         if [ -d /usr/local/aws-cli/v2/current ]; then
           ./aws/install --update
