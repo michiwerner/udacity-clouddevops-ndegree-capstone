@@ -16,8 +16,10 @@ pipeline {
     stage('Deploy') {
       steps {
         withAWS() {
-          def dockerLogin = ecrLogin()
-          sh "${dockerLogin}"
+          script {
+            def dockerLogin = ecrLogin()
+            sh "${dockerLogin}"
+          }
         }
       }
     }
