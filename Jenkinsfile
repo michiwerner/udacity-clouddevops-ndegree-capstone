@@ -22,6 +22,7 @@ pipeline {
             def dockerLogin = ecrLogin()
             sh "${dockerLogin}"
             sh "docker push \$(aws ecr describe-repositories --repository-names 'devops-capstone-sample-workload' --query 'repositories[0].repositoryUri' | sed -e 's/\"//g')"
+            sh "aws eks update-kubeconfig --name devops-capstone-eks-cluster"
           }
         }
       }
