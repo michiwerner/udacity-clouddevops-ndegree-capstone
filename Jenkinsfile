@@ -10,7 +10,7 @@ pipeline {
     }
     stage('Build') {
       steps {
-        echo 'BUILD'
+        sh "cd ./sample_workload/ && docker build -t sample_workload:latest -t sample_workload:${BUILD_NUMBER} ."
       }
     }
     stage('Deploy') {
