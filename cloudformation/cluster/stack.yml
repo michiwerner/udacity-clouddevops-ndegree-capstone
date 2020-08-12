@@ -126,7 +126,7 @@ Resources:
       DiskSize: 30
       ForceUpdateEnabled: true
       InstanceTypes: 
-        - t3.small
+        - t3.large
       NodegroupName: devops-capstone-eks-nodegroup
       NodeRole: !GetAtt EKSNodeRole.Arn
       Subnets: 
