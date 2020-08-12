@@ -21,8 +21,9 @@ spec:
   replicas: 10
   strategy:
     type: RollingUpdate
-    maxUnavailable: 1
-    maxSurge: 1
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: sample-workload
