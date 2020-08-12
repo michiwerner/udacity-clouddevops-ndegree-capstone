@@ -95,6 +95,7 @@ Resources:
           - AMI
       InstanceType: !Ref JenkinsInstanceType
       SubnetId: !ImportValue CapstonePublicSubnet1ID
+      IamInstanceProfile: !Ref JenkinsEC2InstanceProfile
       UserData: !Base64 |
         #!/bin/bash
         set -e
