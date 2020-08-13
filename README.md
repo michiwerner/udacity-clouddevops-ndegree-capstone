@@ -1,6 +1,15 @@
 # udacity-clouddevops-ndegree-capstone
 The capstone project repository for my Udacity Cloud DevOps nanodegree. (https://confirm.udacity.com/SYSYCZN7)
 
+## Disclaimer (see LICENSE)
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 ## Step 1: Stacks
 
 The setup consists of three stacks: A common stack with the networking components (VPC, subnets, gateways etc.), a jenkins stack that provisions the jenkins EC2 instance, and a cluster stack that provisions the actual EKS kubernetes cluster.
